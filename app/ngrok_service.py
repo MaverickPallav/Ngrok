@@ -58,13 +58,14 @@ class NgrokService:
         print(f"Request handled by tunnel: {selected_tunnel.get_type()}")
 
     def add_redirect(self, source_url: str, target_tunnel: Tunnel):
-        # Use '/' for the path in the redirect dictionary
-        self.redirects['/'] = f"http://{target_tunnel.get_local_address()}"
+        self.redirects[source_url] = f"http://{target_tunnel.get_local_address()}"
         print(f"Redirect added: / -> {target_tunnel.get_local_address()}")
-        # Ensure the redirect server is started
-        if not self.redirect_server_thread:
-            redirect_port = int(source_url.split(':')[1])
-            self.redirect_server_thread = threading.Thread(target=start_redirect_server, args=(redirect_port, self.redirects))
-            self.redirect_server_thread.start()
+
+        # Uncomment Below to Start the redirect server
+
+        # if not self.redirect_server_thread:
+        #     redirect_port = int(source_url.split(':')[1])
+        #     self.redirect_server_thread = threading.Thread(target=start_redirect_server, args=(redirect_port, self.redirects))
+        #     self.redirect_server_thread.start()
 
 

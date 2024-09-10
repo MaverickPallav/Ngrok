@@ -8,11 +8,15 @@ class RedirectHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         # Debugging output
+        full_url = f"{self.headers['Host']}{self.path}"
+        target_url = f"{self.headers['Host']}"
+        print(f"Full url {full_url}")
+        print(f"Target url {target_url}")
         print(f"Handling request for path: {self.path}")
         print(f"REDIRECTS {self.redirects}")
 
         # Adjusted to handle requests properly
-        redirect_target = self.redirects.get(self.path)
+        redirect_target = self.redirects.get(target_url)
         if redirect_target:
             print(f"Redirecting to: {redirect_target}")
             self.send_response(302)  # HTTP status code for redirection
