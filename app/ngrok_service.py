@@ -1,6 +1,9 @@
 from tunnel import Tunnel
 from observer import TunnelObserver
 from load_balancer import LoadBalancingStrategy
+from redirect_handler import start_redirect_server
+import requests
+import threading
 
 class NgrokService:
     _instance = None
@@ -11,6 +14,8 @@ class NgrokService:
         self.tunnels = []
         self.observers = []
         self.load_balancer = None
+        self.redirects = {}
+        self.redirect_server_thread = None
 
     @staticmethod
     def get_instance():
@@ -38,8 +43,29 @@ class NgrokService:
     def set_load_balancing_strategy(self, strategy: LoadBalancingStrategy):
         self.load_balancer = strategy
 
-    def handle_request(self):
+    def handle_request(self, request_url: str):
+        if request_url in self.redirects:
+            target_url = self.redirects[request_url]
+            print(f"Redirecting {request_url} to {target_url}")
+            response = requests.get(target_url)
+            print(f"Response from redirected URL: {response.status_code} - {response.text}")
+            return
+
         if not self.load_balancer or not self.tunnels:
             raise Exception("No load balancing strategy set or no tunnels available")
+        
         selected_tunnel = self.load_balancer.select_tunnel(self.tunnels)
         print(f"Request handled by tunnel: {selected_tunnel.get_type()}")
+
+    def add_redirect(self, source_url: str, target_tunnel: Tunnel):
+        self.redirects[source_url] = f"http://{target_tunnel.get_local_address()}"
+        print(f"Redirect added: / -> {target_tunnel.get_local_address()}")
+
+        # Uncomment Below to Start the redirect server
+
+        # if not self.redirect_server_thread:
+        #     redirect_port = int(source_url.split(':')[1])
+        #     self.redirect_server_thread = threading.Thread(target=start_redirect_server, args=(redirect_port, self.redirects))
+        #     self.redirect_server_thread.start()
+
+

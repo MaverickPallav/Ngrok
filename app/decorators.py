@@ -1,24 +1,33 @@
 from tunnel import Tunnel
 
-# Base Decorator class
+# Base TunnelDecorator class
 class TunnelDecorator(Tunnel):
-    def __init__(self, tunnel: Tunnel):
-        self._tunnel = tunnel
+    def __init__(self, decorated_tunnel: Tunnel):
+        self.decorated_tunnel = decorated_tunnel
 
     def start(self):
-        self._tunnel.start()
+        self.decorated_tunnel.start()
 
     def get_type(self):
-        return self._tunnel.get_type()
+        return self.decorated_tunnel.get_type()
 
-# Concrete Logging decorator
+    def get_local_address(self):
+        return self.decorated_tunnel.get_local_address()
+
 class LoggingTunnelDecorator(TunnelDecorator):
-    def start(self):
-        super().start()
-        print(f"Logging enabled for tunnel: {self._tunnel.get_type()}")
+    def __init__(self, decorated_tunnel: Tunnel):
+        super().__init__(decorated_tunnel)
 
-# Concrete Encryption decorator
-class SecureTunnelDecorator(TunnelDecorator):
     def start(self):
         super().start()
-        print(f"Encryption enabled for tunnel: {self._tunnel.get_type()}")
+        print(f"Logging enabled for tunnel: {self.decorated_tunnel.get_type()}")
+
+class SecureTunnelDecorator(TunnelDecorator):
+    def __init__(self, decorated_tunnel: Tunnel):
+        super().__init__(decorated_tunnel)
+
+    def start(self):
+        super().start()
+        print(f"Encryption enabled for tunnel: {self.decorated_tunnel.get_type()}")
+
+

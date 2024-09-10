@@ -5,6 +5,9 @@ class Tunnel:
     def get_type(self):
         raise NotImplementedError("Subclasses should implement this!")
 
+    def get_local_address(self):
+        raise NotImplementedError("Subclasses should implement this!")
+
 # Concrete HTTP Tunnel implementation
 class HttpTunnel(Tunnel):
     def __init__(self, local_address):
@@ -16,6 +19,9 @@ class HttpTunnel(Tunnel):
     def get_type(self):
         return "HTTP"
 
+    def get_local_address(self):
+        return self.local_address
+
 # Concrete TCP Tunnel implementation
 class TcpTunnel(Tunnel):
     def __init__(self, local_address):
@@ -26,3 +32,7 @@ class TcpTunnel(Tunnel):
 
     def get_type(self):
         return "TCP"
+
+    def get_local_address(self):
+        return self.local_address
+
